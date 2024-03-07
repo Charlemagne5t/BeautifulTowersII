@@ -6,30 +6,46 @@ public class Solution {
         long[] left = new long[n];
         long[] right = new long[n];
         Deque<Integer> ms = new ArrayDeque<>();
-        long cur = 0L;
+        ms.push(0);
+
         for(int i = 1; i < n; i++){
+            int j = -1;
             int peakVal = maxHeights.get(i);
             while(!ms.isEmpty() && maxHeights.get(ms.peek()) > peakVal){
-                int j = ms.pop();
-
+                j = ms.pop();
             }
             if(ms.isEmpty()){
                 left[i] = (long) i * peakVal;
-            }else left[i] = left[ms.peek()] + (long) (i - ms.peek()) * maxHeights.get(ms.peek());
-            ms.push(i);
-        }
-        ms = new ArrayDeque<>();
-        for(int i = n - 2; i >= 0; i--){
-            int peakVal = maxHeights.get(i);
-            while(!ms.isEmpty() && maxHeights.get(ms.peek()) > peakVal){
-                ms.pop();
+            }else if(j == -1){
+                left[i] = left[i - 1] + maxHeights.get(i - 1);
+            }else{
+                left[i] = left[ms.peek() + 1] + (long) (i - ms.peek() - 1) * peakVal;;
             }
-            if(ms.isEmpty()){
-                right[i] = (long) (n - 1 - i) * peakVal;
-            }else right[i] = right[ms.peek()] + (long) (n - i - 1 - ms.peek()) * maxHeights.get(ms.peek());
 
             ms.push(i);
         }
+        ms = new ArrayDeque<>();
+
+        List<Integer> rev = reverse(maxHeights);
+
+        ms.push(0);
+        for(int i = 1; i < n; i++){
+            int j = -1;
+            int peakVal = rev.get(i);
+            while(!ms.isEmpty() && rev.get(ms.peek()) > peakVal){
+                j = ms.pop();
+            }
+            if(ms.isEmpty()){
+                right[i] = (long)i * peakVal;
+            }else if(j == -1){
+                right[i] = right[i - 1] + rev.get(i - 1);
+            }else{
+                right[i] = right[ms.peek() + 1] + (long) (i - ms.peek() - 1) * peakVal;
+            }
+
+            ms.push(i);
+        }
+        reverseArr(right);
         System.out.println(maxHeights);
         System.out.println("---------------");
         System.out.println(Arrays.toString(left));
@@ -40,5 +56,20 @@ public class Solution {
 
         }
         return max;
+    }
+
+    List<Integer> reverse(List<Integer> arr){
+        List<Integer> rev = new ArrayList<>();
+        for (int i = arr.size() - 1; i >= 0; i--) {
+            rev.add(arr.get(i));
+        }
+        return rev;
+    }
+    void reverseArr(long[] arr){
+        for (int i = 0; i < arr.length / 2; i++) {
+            long temp = arr[i];
+            arr[i] = arr[arr.length - 1 - i];
+            arr[arr.length - 1 - i] = temp;
+        }
     }
 }
